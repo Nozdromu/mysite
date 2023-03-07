@@ -23,19 +23,31 @@ class mylist:
         self.current = self.head
 
     def add(self, data):
-        self.current.next.prev = data
-        data.next = self.current.next
-        data.prev = self.current
-        self.current.next = data
-        self.current = data
+        data.prev=self.end.prev
+        data.next=self.end
+        self.end.prev.next=data
+        self.end.prev=data
+
 
     def remove(self, data):
         current = self.head
         while current.next != self.end:
             current = current.next
             if current.socket == data:
-                current.prev.next = current.next
-                current.next.prev = current.prev
+                cp=current.prev
+                cn=current.next
+                cp.next=cn
+                cn.prev=cp
+        
+    def userlist(self):
+        userlist=[]
+        current=self.head
+        while current.next!=self.end:
+            current=current.next
+            userlist.append(current.username)
+        return userlist
+
+
 
 
 mlist = mylist()
@@ -49,9 +61,10 @@ class ChatConsumer(WebsocketConsumer):
     def disconnect(self, close_code):
         print(self)
         mlist.remove(self)
+
         s = mlist.head.next
         while s.next != None:
-            print(s.username)
+            s.socket.send(text_data=json.dumps({"type":"login","list": mlist.userlist()}))
             s = s.next
         pass
 
@@ -61,14 +74,9 @@ class ChatConsumer(WebsocketConsumer):
             newnode = listnode(self, text_data_json['username'])
             mlist.add(newnode)
             s = mlist.head.next
-            userlist = []
-            while s.next != None:
-                print(s.username)
-                userlist.append(s.username)
-                s = s.next
             s = mlist.head.next
             while s.next != None:
-                s.socket.send(text_data=json.dumps({"type":"login","list": userlist}))
+                s.socket.send(text_data=json.dumps({"type":"login","list": mlist.userlist()}))
                 s = s.next
 
         elif text_data_json['type'] == "message":

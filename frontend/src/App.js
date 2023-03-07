@@ -60,9 +60,9 @@ export default function App() {
               setchat([...chat])
             } else if (dataFromServer.type === 'login') {
               var list = ['all'];
-              var users = Array.from(dataFromServer.list)
-              for (var i = 0; i < userlist.length; i++) {
-                list.push(users[0]);
+              var users = dataFromServer.list
+              for (var i = 0; i < users.length; i++) {
+                list.push(users[i]);
               }
               setuserlist(list);
               console.log(list);
@@ -165,7 +165,7 @@ export default function App() {
           {chat.map(val => {
             return <Row key={val.key} >
               <Col style={{ textAlign: val.sender === chatinfo.username ? 'right' : 'left' }}>
-                {val.sender + ' : ' + val.text}
+                {val.sender + ' to ' + val.to + ' : ' + val.text}
               </Col>
             </Row>
           })}
