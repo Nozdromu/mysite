@@ -25,9 +25,8 @@ class mylist:
     def add(self, data):
         self.current.next.prev = data
         data.next = self.current.next
-        self.current.next = data
         data.prev = self.current
-
+        self.current.next = data
         self.current = data
 
     def remove(self, data):
@@ -67,19 +66,23 @@ class ChatConsumer(WebsocketConsumer):
                 print(s.username)
                 userlist.append(s.username)
                 s = s.next
-            self.send(text_data=json.dumps({"list": userlist}))
+            s = mlist.head.next
+            while s.next != None:
+                s.socket.send(text_data=json.dumps({"type":"login","list": userlist}))
+                s = s.next
 
         elif text_data_json['type'] == "message":
             if text_data_json['to'] == "all":
                 current = mlist.head.next
                 while current.next != None:
                     current.socket.send(text_data=json.dumps(text_data_json))
+                    current = current.next
             else:
                 current = mlist.head.next
                 while current.next != None:
                     if current.username == text_data_json['to']:
-                        current.socket.send(
-                            text_data=json.dumps(text_data_json))
+                        current.socket.send(text_data=json.dumps(text_data_json))
+                    current = current.next
                 self.send(text_data=json.dumps(text_data_json))
 
         # message = text_data_json["message"]

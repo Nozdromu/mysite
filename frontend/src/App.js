@@ -51,15 +51,20 @@ export default function App() {
         socket.onmessage = (message) => {
           console.log(message)
           const dataFromServer = JSON.parse(message.data);
-          dataFromServer.key = dataFromServer.sender + count + Math.random();
+
           setcount(count + 1)
           if (dataFromServer) {
             if (dataFromServer.type === 'message') {
+              dataFromServer.key = dataFromServer.sender + count + Math.random();
               chat.push(dataFromServer)
               setchat([...chat])
             } else if (dataFromServer.type === 'login') {
               var list = ['all'];
-              list.concat(dataFromServer.list)
+              var users = Array.from(dataFromServer.list)
+              for (var i = 0; i < userlist.length; i++) {
+                list.push(users[0]);
+              }
+              setuserlist(list);
               console.log(list);
             }
 
@@ -177,7 +182,7 @@ export default function App() {
                     type: "message",
                     text: s.current.value,
                     sender: chatinfo.username,
-                    to:l.current.value
+                    to: l.current.value
                   })
                 );
               }}>send</Button>
