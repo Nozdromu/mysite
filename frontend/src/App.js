@@ -149,7 +149,7 @@ export default function App() {
             <Col>
               <Form.Select ref={l}>
                 {userlist.map(val => {
-                  return <option value={val}>{val}</option>
+                  return <option key={val} value={val}>{val}</option>
                 })}
               </Form.Select>
             </Col>
