@@ -12,7 +12,6 @@ export default function App() {
   const [count, setcount] = useState(0);
   const [userlist, setuserlist] = useState(['all']);
   var u = useRef(null);
-  var r = useRef(null);
   var s = useRef(null);
   var l = useRef(null)
 
@@ -20,14 +19,13 @@ export default function App() {
     event.preventDefault();
     var info = {
       username: u.current.value,
-      room: r.current.value
     }
     setchatinfo(info);
   }
 
   useEffect(() => {
     if (chatinfo) {
-      var ws = new W3CWebSocket('ws://127.0.0.1:8000/ws/chat/' + chatinfo.room + '/');
+      var ws = new W3CWebSocket('ws://127.0.0.1:8000/ws/chat/');
       ws.onopen = () => {
         console.log("WebSocket Client Connected");
         ws.send(
@@ -76,9 +74,6 @@ export default function App() {
     }
   }, [socket])
 
-  useEffect(() => {
-
-  }, [open])
 
   useEffect(() => {
     setcount(count + 1)
@@ -110,22 +105,6 @@ export default function App() {
                     </InputGroup>
                   </Col>
                 </Row>
-                <Row>
-                  <Col>
-                    <InputGroup className="mb-3">
-                      <Form.Control
-                        ref={r}
-                        placeholder="Enter roomname"
-                        aria-label="Enter roomname"
-                        aria-describedby="basic-addon2"
-                        required
-                      />
-                      {/* <Button variant="outline-secondary" id="button-addon3">
-                      Button
-                    </Button> */}
-                    </InputGroup>
-                  </Col>
-                </Row>
               </Form>
 
             </Card.Body>
@@ -144,52 +123,56 @@ export default function App() {
 
     </Container>
   ) : (
-    <Container>
-      <Card>
-        <Card.Header>
-          <Row>
-            <Col>
-              {chatinfo.username + ' in ' + chatinfo.room}
-            </Col>
-            <Col>
-              <Form.Select ref={l}>
-                {userlist.map(val => {
-                  return <option key={val} value={val}>{val}</option>
-                })}
-              </Form.Select>
-            </Col>
-          </Row>
+    <Container style={{ height: '100%' }}>
+      <Row className='justify-content-center align-items-center' style={{ height: '100%' }}>
+        <Col lg={4}>
+          <Card>
+            <Card.Header>
+              <Row>
+                <Col>
+                  {chatinfo.username}
+                </Col>
+                <Col>
+                  <Form.Select ref={l}>
+                    {userlist.map(val => {
+                      return <option key={val} value={val}>{val}</option>
+                    })}
+                  </Form.Select>
+                </Col>
+              </Row>
 
-        </Card.Header>
-        <Card.Body>
-          {chat.map(val => {
-            return <Row key={val.key} >
-              <Col style={{ textAlign: val.sender === chatinfo.username ? 'right' : 'left' }}>
-                {val.sender + ' to ' + val.to + ' : ' + val.text}
-              </Col>
-            </Row>
-          })}
-        </Card.Body>
-        <Card.Footer>
-          <Row>
-            <Col>
-              <Form.Control ref={s} type='input' />
-            </Col>
-            <Col>
-              <Button onClick={() => {
-                socket.send(
-                  JSON.stringify({
-                    type: "message",
-                    text: s.current.value,
-                    sender: chatinfo.username,
-                    to: l.current.value
-                  })
-                );
-              }}>send</Button>
-            </Col>
-          </Row>
-        </Card.Footer>
-      </Card>
+            </Card.Header>
+            <Card.Body>
+              {chat.map(val => {
+                return <Row key={val.key} >
+                  <Col style={{ textAlign: val.sender === chatinfo.username ? 'right' : 'left' }}>
+                    {val.sender + ' to ' + val.to + ' : ' + val.text}
+                  </Col>
+                </Row>
+              })}
+            </Card.Body>
+            <Card.Footer>
+              <Row>
+                <Col>
+                  <Form.Control ref={s} type='input' />
+                </Col>
+                <Col>
+                  <Button onClick={() => {
+                    socket.send(
+                      JSON.stringify({
+                        type: "message",
+                        text: s.current.value,
+                        sender: chatinfo.username,
+                        to: l.current.value
+                      })
+                    );
+                  }}>send</Button>
+                </Col>
+              </Row>
+            </Card.Footer>
+          </Card>
+        </Col>
+      </Row>
     </Container>
   )
 }
